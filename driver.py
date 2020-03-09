@@ -10,13 +10,22 @@ from PIL import Image, ImageTk
 
 class GUI_Main:
     def __init__(self, master, roomList):
-        self.master = master
         
         master.title("Schedule Planner v0.00001")
-        self.frame_roomList = Frame(master)
+        #Frame.__init__(self,master)
+        self.display_canvas = Canvas(master)
+        self.frame_roomList = Frame(self.display_canvas)
+        self.sbY = Scrollbar(self.display_canvas,command=self.display_canvas.yview)
+        self.sbX = Scrollbar(self.display_canvas,orient='horizontal',command = self.display_canvas.xview)
+        self.display_canvas.configure(yscrollcommand = self.sbY.set, xscrollcommand = self.sbX.set)
+        self.sbY.pack(side="right",fill="y")
+        self.sbX.pack(side="bottom",fill="x")
+        self.display_canvas.pack(side="left",fill="both",expand=True)
+        self.display_canvas.create_window((0,0),window=self.frame_roomList,anchor='nw')
+        self.frame_roomList.bind("<Configure>",self.function1)
         self.main_font = Font(family = "Arial",size = 15)
 
-        self.frame_roomList.grid()
+        #self.frame_roomList.grid()
         i = 1
         flag = 0
         timeDisplay = 8.0 #start at 8 AM
@@ -42,7 +51,8 @@ class GUI_Main:
             for time in range(len(item.timeSlots)):
                 self.label_class = Label(self.frame_roomList, text = item.timeSlots[time], font = self.main_font)
                 self.label_class.grid(row = time + 1, column = i, sticky = W)
-
+    def function1(self,event):
+        self.display_canvas.configure(scrollregion=self.display_canvas.bbox("all"))
 room1 = Room("BIO","101")
 room2 = Room("BIO","102")
 room3 = Room("MATH","101")
@@ -55,5 +65,5 @@ roomList = [room1,room2,room3,room4,room5]
 interface = Tk()
 interface.geometry("800x600")
 interface.configure(bg="black")
-my_gui = GUI_Main(interface,roomList)
+GUI_Main(interface,roomList)
 interface.mainloop()
