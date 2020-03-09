@@ -19,19 +19,29 @@ class GUI_Main:
         self.frame_roomList.grid()
         i = 1
         flag = 0
+        timeDisplay = 8.0 #start at 8 AM
         for item in roomList:
             self.label_room = Label(self.frame_roomList,text = item.getRoomName(), font = self.main_font)
             self.label_room.grid(row=0 ,column = i, sticky = W)
             i = i + 1
-            #if flag == 0:
-                #flag = 1
+            #time slots on left side
             for x in range(len(item.timeSlots)):
-                self.label_time = Label(self.frame_roomList, text = x + 1, font = self.main_font)
-                self.label_time.grid(row = x + 1,column = 0, sticky = W)
+                if(flag==0):
+                    if(timeDisplay < 1):
+                        timeDisplay = timeDisplay + 12
+                    timeDisplayString = str(format(timeDisplay,".2f"))
+                    timeDisplayString = timeDisplayString.replace(".",":")
+                    self.label_time = Label(self.frame_roomList, text = timeDisplayString, font = self.main_font)
+                    self.label_time.grid(row = x + 1,column = 0, sticky = W)
+                    timeDisplay = (timeDisplay + .3)
+                    if(round(timeDisplay) > timeDisplay):
+                        timeDisplay = round(timeDisplay)
+                        timeDisplay = (timeDisplay) % 12
+            flag = 1
+            #events in each room per time slot
             for time in range(len(item.timeSlots)):
                 self.label_class = Label(self.frame_roomList, text = item.timeSlots[time], font = self.main_font)
                 self.label_class.grid(row = time + 1, column = i, sticky = W)
-
 
 room1 = Room("BIO","101")
 room2 = Room("BIO","102")

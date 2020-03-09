@@ -1,7 +1,7 @@
 class Room:
     def __init__(self,arg1,arg2):
         self.roomName = arg1 + " " + arg2
-        self.timeSlotsCount = 5
+        self.timeSlotsCount = 28
         self.timeSlots = [0] * self.timeSlotsCount
     def addClassTime(self,timeSlot):
         self.timeSlots[timeSlot]=1
