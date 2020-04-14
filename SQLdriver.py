@@ -5,7 +5,7 @@
 # bhornic1@umbc.edu
 ###
 from Room import Room
-from GUI_Main import GUI_Main
+from GUI_Search import GUI_Main
 from tkinter import *
 from tkinter.font import Font
 from PIL import Image, ImageTk
@@ -35,24 +35,23 @@ roomList = []
 for building, roomnum in cursor.fetchall():
     roomList.append(Room(building, str(roomnum) ) )
 
-# room1 = Room("BIO","101")
-# room2 = Room("BIO","102")
-# room3 = Room("MATH","101")
-# room4 = Room("MATH","201")
-# room5 = Room("ENG","101")
-# room5.addEvent(1)
-
-# roomList = [room1,room2,room3,room4,room5]
-
 interface = Tk()
 interface.geometry("800x600")
 interface.configure(bg="black")
 window1 = GUI_Main(interface,roomList)
 
 testBuilding = input("Class Name: ")
-testRNumber = input("Room Number: ")
-room6 = Room(testBuilding,testRNumber)
-roomList.append(room6)
+
+query1 = "select building, roomnum from rooms where building = '" + window1.entry_search_building.get() + "' AND roomnum = '" + window1.entry_search_num.get() + "'"
+cursor.execute(query1)
+
+roomList = []
+for building, roomnum in cursor.fetchall():
+    roomList.append(Room(building, str(roomnum) ) )
+
+# testRNumber = input("Room Number: ")
+# room6 = Room(testBuilding,testRNumber)
+# roomList.append(room6)
 window1.buildItems(roomList)
 
 interface.mainloop()
