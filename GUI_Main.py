@@ -9,6 +9,8 @@ from tkinter import *
 from tkinter.font import Font
 from PIL import Image, ImageTk
 import fileOperations as fOp
+from Room import Room
+from Events import Events
 
 class GUI_Main:
     def __init__(self,master,roomList):
@@ -57,7 +59,7 @@ class GUI_Main:
 #Add Event(class) options outside of file
         self.frame_addEvent = Frame(self.frame_OptionMaster,width=50,bg="red")
 
-
+#Grid option frames
         self.frame_openFiles.grid(column=1)
         self.frame_addRoom.grid(column=2)
         self.frame_addEvent.grid(column=3)
@@ -101,6 +103,7 @@ class GUI_Main:
         self.canvas_rooms.configure(width = w)
         self.canvas_classes.configure(width = w)
         self.font_DisplayItems = Font(family = "Arial",size = 15)
+        self.placeholderEvent = Events("BIO","110"," ","02"," ","TTH2",50)
 
         self.gridWidth = 10
         self.gridHeight = 1
@@ -128,8 +131,9 @@ class GUI_Main:
             flag = 1
             #events in each room per time slot
             for time in range(len(item.timeSlots)):
-                self.label_class = Label(self.frame_classes, text = item.timeSlots[time], font = self.font_DisplayItems,width = self.gridWidth,height = self.gridHeight)
-                self.label_class.grid(row = time + 1, column = i, sticky = W)
+                self.placeholderEvent = item.getEvent(time)
+                self.button_event = Button(self.frame_classes, text = self.placeholderEvent.getSubject() , font = self.font_DisplayItems,width = self.gridWidth,height = self.gridHeight)
+                self.button_event.grid(row = time + 1, column = i, sticky = W)
 
     def function1(self,event):
         self.canvas_classes.configure(scrollregion=self.canvas_classes.bbox("all"))
