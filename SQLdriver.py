@@ -37,12 +37,12 @@ cursor.execute("SELECT version();")
 record = cursor.fetchone()
 print("You are connected to - ", record,"\n")
 
-query1 = "select building, roomnum from rooms"
+query1 = "select building, roomnum, capacity from rooms"
 cursor.execute(query1)
 
 roomList = []
-for building, roomnum in cursor.fetchall():
-    roomList.append(Room(building, str(roomnum) ) )
+for building, roomnum, capacity in cursor.fetchall():
+    roomList.append(Room(building, str(roomnum) , str(capacity)) )
 
 interface = Tk()
 interface.geometry("800x600")
@@ -61,12 +61,12 @@ if(window1.entry_search_building.get() != ""):
     query1 = "Select building, roomnum from rooms where building = '" + str(window1.entry_search_building.get())+"' and roomnum = '"+ str(window1.entry_search_num.get()) + "';"
     cursor.execute(query1)
 else:
-    query1 = "select building, roomnum from rooms"
+    query1 = "select building, roomnum, capacity from rooms"
     cursor.execute(query1)
 
 roomList = []
-for building, roomnum in cursor.fetchall():
-    roomList.append(Room(building, str(roomnum) ) )
+for building, roomnum, capacity in cursor.fetchall():
+    roomList.append(Room(building, str(roomnum) , str(capacity)) )
 
 # testRNumber = input("Room Number: ")
 # room6 = Room(testBuilding,testRNumber)
