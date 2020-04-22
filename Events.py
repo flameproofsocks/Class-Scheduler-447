@@ -4,7 +4,7 @@
 # jordonm1@umbc.edu
 ###
 class Events:
-    def __init__(self, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
+    def __init__(self, arg1=" ", arg2=" ", arg3=" ", arg4=" ", arg5=" ", arg6=" ", arg7=0):
         self.subject = arg1
         self.courseNum = arg2
         self.version = arg3
