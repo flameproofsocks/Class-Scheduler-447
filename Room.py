@@ -4,8 +4,10 @@
 # @author: Brett Hornick
 # bhornic1@umbc.edu
 ###
+from Events import Events
 class Room:
-    def __init__(self,arg1,arg2):
+    def __init__(self,arg1,arg2,arg3):
+        placeholdEvent = Events(" "," "," "," "," "," ",0)
         self.buildingName = arg1    
         self.roomNumber = arg2
         self.roomName = arg1 + " " + arg2   #Combination of room name and number, for ease of printing data
@@ -20,7 +22,9 @@ class Room:
         return self.roomName
     def getRoomCapacity(self):
         return self.roomCapacity
-    def addEvent(self,timeSlot):
-        self.timeSlots[timeSlot]=1      #switch data to new argument, of type "roomEvent"
+    def addEvent(self,timeSlot,newEvent):
+        self.timeSlots[timeSlot]=newEvent     #switch data to new argument, of type "roomEvent"
     def removeEvent(self,timeSlot):
         self.timeSlots[timeSlot]=0
+    def getEvent(self,timeSlot):
+        return self.timeSlots[timeSlot]
