@@ -9,6 +9,7 @@ from tkinter import *
 from tkinter.font import Font
 from PIL import Image, ImageTk
 import fileOperations as fOp
+import guiOperations as gOp
 from Room import Room
 from Events import Events
 
@@ -21,52 +22,29 @@ class GUI_Main:
         self.frame_OptionMaster.pack(side="top",fill="both",expand=True)
 
 #Open file options
-        self.fileName = " "
-        self.fileType = 0 #0 for room list, 1 for class list
         self.frame_openFiles = Frame(self.frame_OptionMaster,width=200)
-        self.button_selectFile = Button(self.frame_openFiles,text="Select File",command=lambda: fOp.selectFile(self,self.fileName))
-        self.label_fileType = Label(self.frame_openFiles,text="Select File Type:")
-        self.rbutton_fileType1 = Radiobutton(self.frame_openFiles,text="Room List",variable=self.fileType,value=0)
-        self.rbutton_fileType2 = Radiobutton(self.frame_openFiles,text="Class List",variable=self.fileType,value=1)
-        self.button_addFile = Button(self.frame_openFiles,text="Add Selected File",command=lambda: fOp.addFile(self,self.fileName,self.fileType))
+        self.buildOpenFilesFrame(self.frame_openFiles)
 
-        self.button_selectFile.grid(row=1)
-        self.label_fileType.grid(row=2)
-        self.rbutton_fileType1.grid(row=3)
-        self.rbutton_fileType2.grid(row=4)
-        self.button_addFile.grid(row=5)
-
-#Add room options outside of file
-        self.frame_addRoom = Frame(self.frame_OptionMaster,width=50,bg="yellow")
-        self.label_addRoom_title = Label(self.frame_addRoom,text="Add Room")
-        self.label_addRoom_name = Label(self.frame_addRoom,text="Room Name: ")
-        self.entry_addRoom_name = Entry(self.frame_addRoom)
-        self.label_addRoom_number = Label(self.frame_addRoom,text="Room Number:")
-        self.entry_addRoom_number = Entry(self.frame_addRoom)
-        self.label_addRoom_capacity = Label(self.frame_addRoom,text="Capacity: ")
-        self.entry_addRoom_capacity = Entry(self.frame_addRoom)
-
-        self.label_addRoom_title.grid(row=1,columnspan=2)
-        self.label_addRoom_name.grid(row=2,column=1)
-        self.entry_addRoom_name.grid(row=2,column=2)
-        self.label_addRoom_number.grid(row=3,column=1)
-        self.entry_addRoom_number.grid(row=3,column=2)
-        self.label_addRoom_capacity.grid(row=4,column=1)
-        self.entry_addRoom_capacity.grid(row=4,column=2)
-
-
+#Add room outside of file
+        self.frame_addRoom = Frame(self.frame_OptionMaster)
+        self.buildAddRoomFrame(self.frame_addRoom)
 
 #Add Event(class) options outside of file
-        self.frame_addEvent = Frame(self.frame_OptionMaster,width=50,bg="red")
+        self.frame_addEvent = Frame(self.frame_OptionMaster)
+        self.buildAddEventFrame(self.frame_addEvent)
+
+#Search options
+        self.frame_search = Frame(self.frame_OptionMaster)
+        self.buildSearchFrame(self.frame_search)
 
 #Grid option frames
-        self.frame_openFiles.grid(column=1)
-        self.frame_addRoom.grid(column=2)
-        self.frame_addEvent.grid(column=3)
+        self.frame_openFiles.grid(column=1,row=0)
+        self.frame_addRoom.grid(column=2,row=0)
+        self.frame_addEvent.grid(column=3,row=0)
+        self.frame_search.grid(column=4,row=0)
         
 #Data Display Section
         self.canvas_DataMaster = Canvas(master)
-
         self.canvas_DataMaster.pack(side="bottom",fill="both",expand=True)
 
         self.canvas_rooms = Canvas(self.canvas_DataMaster,height=25)
@@ -96,14 +74,17 @@ class GUI_Main:
         self.frame_times.bind("<Configure>",self.function1)
         self.frame_rooms.bind("<Configure>",self.function1)
 
-        self.buildItems(roomList)
+        self.buildItems(roomList,0,0)
         
-    def buildItems(self,roomList):
+    def buildItems(self,roomList,startTime,endTime):
+        sTime = 0 + startTime #starts at 0, max eTime
+        eTime = 28 - endTime  #starts at max of roomList timeslots, should be 28, min sTime
+        #NO ERROR CHECKING, please do error checing before calling buildItems
         w = len(roomList * 111)
         self.canvas_rooms.configure(width = w)
         self.canvas_classes.configure(width = w)
         self.font_DisplayItems = Font(family = "Arial",size = 15)
-        self.placeholderEvent = Events("BIO","110"," ","02"," ","TTH2",50)
+        self.placeholderEvent = Events()
 
         self.gridWidth = 10
         self.gridHeight = 1
@@ -147,3 +128,87 @@ class GUI_Main:
     def adjustXview(self,*args):
         self.canvas_classes.xview(*args)
         self.canvas_rooms.xview(*args)
+    
+    def buildOpenFilesFrame(self,master):
+        self.fileName = " "
+        self.fileType = 0 #0 for room list, 1 for class list
+        self.button_selectFile = Button(master,text="Select File",command=lambda: fOp.selectFile(self,self.fileName))
+        self.label_fileType = Label(master,text="Select File Type:")
+        self.rbutton_fileType1 = Radiobutton(master,text="Room List",variable=self.fileType,value=0)
+        self.rbutton_fileType2 = Radiobutton(master,text="Class List",variable=self.fileType,value=1)
+        self.button_addFile = Button(master,text="Add Selected File",command=lambda: fOp.addFile(self,self.fileName,self.fileType))
+
+        self.button_selectFile.grid(row=1)
+        self.label_fileType.grid(row=2)
+        self.rbutton_fileType1.grid(row=3)
+        self.rbutton_fileType2.grid(row=4)
+        self.button_addFile.grid(row=5)
+
+    def buildAddRoomFrame(self,master):
+        self.label_addRoom_title = Label(master,text="Add Room")
+        self.label_addRoom_name = Label(master,text="Room Name: ")
+        self.entry_addRoom_name = Entry(master)
+        self.label_addRoom_number = Label(master,text="Room Number:")
+        self.entry_addRoom_number = Entry(master)
+        self.label_addRoom_capacity = Label(master,text="Capacity: ")
+        self.entry_addRoom_capacity = Entry(master)
+        self.button_addRoom = Button(master,text="Add") #command to be added when file reading is complete
+
+        self.label_addRoom_title.grid(row=1,columnspan=2)
+        self.label_addRoom_name.grid(row=2,column=1)
+        self.entry_addRoom_name.grid(row=2,column=2)
+        self.label_addRoom_number.grid(row=3,column=1)
+        self.entry_addRoom_number.grid(row=3,column=2)
+        self.label_addRoom_capacity.grid(row=4,column=1)
+        self.entry_addRoom_capacity.grid(row=4,column=2)
+        self.button_addRoom.grid(row=5,columnspan=2)
+
+    def buildAddEventFrame(self,master):
+        self.label_addEvent_title = Label(master,text="Add Class")
+        self.label_addEvent_subject = Label(master,text="Subject: ")
+        self.entry_addEvent_subject = Entry(master)
+        self.label_addEvent_courseNum = Label(master,text="Course Number: ")
+        self.entry_addEvent_courseNum = Entry(master)
+        self.label_addEvent_section = Label(master,text="Section Number: ")
+        self.entry_addEvent_section = Entry(master)
+        self.label_addEvent_instructor = Label(master,text="Instructor: ")
+        self.entry_addEvent_instructor = Entry(master)
+        self.label_addEvent_time = Label(master,text="Prefered time: ")
+        self.entry_addEvent_time = Entry(master)
+        self.label_addEvent_capacity = Label(master,text="Capacity: ")
+        self.entry_addEvent_capacity = Entry(master)
+        self.button_addEvent = Button(master,text="Add") #command to be added when file reading is complete
+
+        self.label_addEvent_title.grid(row=0)
+        self.label_addEvent_subject.grid(row=1,column=0)
+        self.entry_addEvent_subject.grid(row=1,column=1)
+        self.label_addEvent_courseNum.grid(row=2,column=0)
+        self.entry_addEvent_courseNum.grid(row=2,column=1)
+        self.label_addEvent_section.grid(row=3,column=0)
+        self.entry_addEvent_section.grid(row=3,column=1)
+        self.label_addEvent_instructor.grid(row=4,column=0)
+        self.entry_addEvent_instructor.grid(row=4,column=1)
+        self.label_addEvent_time.grid(row=5,column=0)
+        self.entry_addEvent_time.grid(row=5,column=1)
+        self.label_addEvent_capacity.grid(row=6,column=0)
+        self.entry_addEvent_capacity.grid(row=6,column=1)
+        self.button_addEvent.grid(row=7,column=1,columnspan=2)
+
+    def buildSearchFrame(self,master):
+        cb1Var = 0
+        cb2Var = 0
+        self.label_search_title = Label(master,text="Search")
+        self.label_search_keyword = Label(master,text="Keywords: ")
+        self.entry_search_keyword = Entry(master)
+        self.label_search_type = Label(master,text="Search catagories: ")
+        self.checkbox_search_room = Checkbutton(master,text="Rooms",variable=cb1Var)
+        self.checkbox_search_classes = Checkbutton(master,text="Classes",variable = cb2Var)
+        self.button_search = Button(master,text="Search") #add command at later date
+
+        self.label_search_title.grid(row=0)
+        self.label_search_keyword.grid(row=1,column=0)
+        self.entry_search_keyword.grid(row=1,column=1)
+        self.label_search_type.grid(row=2,column=0)
+        self.checkbox_search_room.grid(row=3,column=1)
+        self.checkbox_search_classes.grid(row=4,column=1)
+        self.button_search.grid(row=5,column=1)
