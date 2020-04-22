@@ -41,5 +41,6 @@ testCapacity = input("Room Capacity: ")
 room6 = Room(testBuilding,testRNumber,testCapacity)
 roomList.append(room6)
 window1.buildItems(roomList,0,0)
+window1.buildEventInfoFrame(window1.frame_EventInfo,event1)
 
 interface.mainloop()

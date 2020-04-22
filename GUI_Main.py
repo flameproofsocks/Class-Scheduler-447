@@ -16,6 +16,7 @@ from Events import Events
 class GUI_Main:
     def __init__(self,master,roomList):
         master.title("Schedule Planner v0.1")
+        self.placeholderEvent = Events()
 
 #Options Section
         self.frame_OptionMaster = Frame(master,height = 100)
@@ -42,6 +43,11 @@ class GUI_Main:
         self.frame_addRoom.grid(column=2,row=0)
         self.frame_addEvent.grid(column=3,row=0)
         self.frame_search.grid(column=4,row=0)
+
+#Event information Section
+        self.frame_EventInfo = Frame(master,height = 100)
+        self.frame_EventInfo.pack(side="bottom",fill="both",expand=True)
+        self.buildEventInfoFrame(self.frame_EventInfo,self.placeholderEvent)
         
 #Data Display Section
         self.canvas_DataMaster = Canvas(master)
@@ -75,7 +81,7 @@ class GUI_Main:
         self.frame_rooms.bind("<Configure>",self.function1)
 
         self.buildItems(roomList,0,0)
-        
+  
     def buildItems(self,roomList,startTime,endTime):
         sTime = 0 + startTime #starts at 0, max eTime
         eTime = 28 - endTime  #starts at max of roomList timeslots, should be 28, min sTime
@@ -84,7 +90,6 @@ class GUI_Main:
         self.canvas_rooms.configure(width = w)
         self.canvas_classes.configure(width = w)
         self.font_DisplayItems = Font(family = "Arial",size = 15)
-        self.placeholderEvent = Events()
 
         self.gridWidth = 10
         self.gridHeight = 1
@@ -113,7 +118,8 @@ class GUI_Main:
             #events in each room per time slot
             for time in range(len(item.timeSlots)):
                 self.placeholderEvent = item.getEvent(time)
-                self.button_event = Button(self.frame_classes, text = self.placeholderEvent.getSubject() , font = self.font_DisplayItems,width = self.gridWidth,height = self.gridHeight)
+                self.button_event = Button(self.frame_classes, text = self.placeholderEvent.getSubject()+" "+self.placeholderEvent.getCourseNum() , font = self.font_DisplayItems,width = self.gridWidth,height = self.gridHeight)
+                self.button_event.configure(command = lambda: self.buildEventInfoFrame(self.frame_EventInfo, self.placeholderEvent))
                 self.button_event.grid(row = time + 1, column = i, sticky = W)
 
     def function1(self,event):
@@ -216,3 +222,15 @@ class GUI_Main:
     def searchDB(self,keywords,searchRooms,searchEvents,sTime,eTime):
         roomList = gOp.searchDB(self,keywords,searchRooms,searchEvents)
         self.buildItems(roomList,sTime,eTime)
+
+    def buildEventInfoFrame(self,master,displayEvent):
+        print("Updated Event Info")
+        self.label_eventInfo_courseName = Label(master,text="Course Name: " +displayEvent.getSubject() + " "+ displayEvent.getCourseNum())
+        self.label_eventInfo_section = Label(master,text="Section: "+displayEvent.getSection())
+        self.label_eventInfo_instructor = Label(master,text="Instructor: "+displayEvent.getInstructor())
+        self.label_eventInfo_capacity= Label(master,text="Class Capacity"+str(displayEvent.getCapacity()))
+
+        self.label_eventInfo_courseName.grid(row=0,column=0)
+        self.label_eventInfo_section.grid(row=1,column=0)
+        self.label_eventInfo_instructor.grid(row=2,column=0)
+        self.label_eventInfo_capacity.grid(row=3,column=0)
