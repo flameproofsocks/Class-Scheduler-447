@@ -195,15 +195,15 @@ class GUI_Main:
         self.button_addEvent.grid(row=7,column=1,columnspan=2)
 
     def buildSearchFrame(self,master):
-        cb1Var = 0
-        cb2Var = 0
+        self.cb1Var = 0
+        self.cb2Var = 0
         self.label_search_title = Label(master,text="Search")
         self.label_search_keyword = Label(master,text="Keywords: ")
         self.entry_search_keyword = Entry(master)
         self.label_search_type = Label(master,text="Search catagories: ")
-        self.checkbox_search_room = Checkbutton(master,text="Rooms",variable=cb1Var)
-        self.checkbox_search_classes = Checkbutton(master,text="Classes",variable = cb2Var)
-        self.button_search = Button(master,text="Search") #add command at later date
+        self.checkbox_search_room = Checkbutton(master,text="Rooms",variable=self.cb1Var)
+        self.checkbox_search_classes = Checkbutton(master,text="Classes",variable = self.cb2Var)
+        self.button_search = Button(master,text="Search",command = lambda: self.searchDB(self.entry_search_keyword,self.cb1Var,self.cb2Var,0,0) ) #add command at later date
 
         self.label_search_title.grid(row=0)
         self.label_search_keyword.grid(row=1,column=0)
@@ -212,3 +212,7 @@ class GUI_Main:
         self.checkbox_search_room.grid(row=3,column=1)
         self.checkbox_search_classes.grid(row=4,column=1)
         self.button_search.grid(row=5,column=1)
+
+    def searchDB(self,keywords,searchRooms,searchEvents,sTime,eTime):
+        roomList = gOp.searchDB(self,keywords,searchRooms,searchEvents)
+        self.buildItems(roomList,sTime,eTime)

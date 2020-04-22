@@ -40,6 +40,6 @@ testRNumber = input("Room Number: ")
 testCapacity = input("Room Capacity: ")
 room6 = Room(testBuilding,testRNumber,testCapacity)
 roomList.append(room6)
-window1.buildItems(roomList)
+window1.buildItems(roomList,0,0)
 
 interface.mainloop()

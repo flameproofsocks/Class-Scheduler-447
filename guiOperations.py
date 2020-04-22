@@ -1,6 +1,6 @@
 from Room import Room
 
-def searchDB(self,guiItem, keywords,searchRooms,searchEvents,sTime,eTime):
+def searchDB(self, keywords,searchRooms,searchEvents):
     #search db based on keywords
     #search rooms for keywords if searchRooms = 1
     #search events for keywords is searchEvents = 1
@@ -8,7 +8,8 @@ def searchDB(self,guiItem, keywords,searchRooms,searchEvents,sTime,eTime):
     roomList = []
 
     #TESTING
-    roomTest = Room("BIO","101",200)
+    roomTest = Room("ENG","202",200)
     roomList.append(roomTest)
+    #end testing
 
-    guiItem.buildItems(roomList,sTime,eTime)
+    return roomList
