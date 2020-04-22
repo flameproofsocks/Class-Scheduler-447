@@ -7,12 +7,12 @@
 from Events import Events
 class Room:
     def __init__(self,arg1,arg2,arg3):
-        placeholdEvent = Events(" "," "," "," "," "," ",0)
+        placeholdEvent = Events()
         self.buildingName = arg1    
         self.roomNumber = arg2
         self.roomName = arg1 + " " + arg2   #Combination of room name and number, for ease of printing data
         self.timeSlotsCount = 28    #8:00AM-9:30PM in 30 min increments
-        self.timeSlots = [0] * self.timeSlotsCount  
+        self.timeSlots = [placeholdEvent] * self.timeSlotsCount  
         self.roomCapacity = 0       #switch to arg3 at some point
     def getBuidlingName(self):
         return self.buildingName
