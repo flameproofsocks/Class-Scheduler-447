@@ -86,23 +86,33 @@ testBuilding = input("Class Name: ")
 if(window1.entry_addRoom_name.get() != ""):
 
     #query1 = "select building, roomnum from rooms where building = '" + window1.entry_search_building.get() + "' AND roomnum = '" + window1.entry_search_num.get() + "'"
-    query1 = "INSERT INTO rooms VALUES(7, '"+ str(window1.entry_addRoom_name.get()) + "', '" + str(window1.entry_addRoom_number.get()) + "', 30, 'Classroom') ON CONFLICT DO NOTHING;"
+    cursor.execute(DBqueries.findIndexRooms)
+    nextID = int(cursor.fetchone() ) + 1 #next index
+    query1 = "INSERT INTO rooms VALUES("+str(nextID)+", '"+ str(window1.entry_addRoom_name.get()) + "', '" + str(window1.entry_addRoom_number.get()) + "', 30, 'Classroom') ON CONFLICT DO NOTHING;"
     cursor.execute(query1)
 
-if(window1.entry_search_building.get() != ""):
-    query1 = "Select building, roomnum from rooms where building = '" + str(window1.entry_search_building.get())+"' and roomnum = '"+ str(window1.entry_search_num.get()) + "';"
+if(window1.entry_addEvent_subject.get() != ""):
+
+    #query1 = "select building, roomnum from rooms where building = '" + window1.entry_search_building.get() + "' AND roomnum = '" + window1.entry_search_num.get() + "'"
+    cursor.execute(DBqueries.findIndexEvents)
+    nextID = int(cursor.fetchone()[0] ) + 1 #next index
+    query1 = "INSERT INTO events VALUES("+str(nextID)+", '"+ str(window1.entry_addEvent_subject.get()) + "', '" + str(window1.entry_addEvent_courseNum.get()) + "', 10101, '10:00:00', '11:15:00', 'Class from UI', " + str(window1.entry_addEvent_instructor.get()) +", 1) ON CONFLICT DO NOTHING;"
     cursor.execute(query1)
-else:
-    query1 = "select building, roomnum, capacity from rooms"
-    cursor.execute(query1)
 
-roomList = []
-for building, roomnum, capacity in cursor.fetchall():
-    roomList.append(Room(building, str(roomnum) , str(capacity)) )
+# if(window1.entry_search_building.get() != ""):
+#     query1 = "Select building, roomnum from rooms where building = '" + str(window1.entry_search_building.get())+"' and roomnum = '"+ str(window1.entry_search_num.get()) + "';"
+#     cursor.execute(query1)
+# else:
+#     query1 = "select building, roomnum, capacity from rooms"
+#     cursor.execute(query1)
 
-# testRNumber = input("Room Number: ")
-# room6 = Room(testBuilding,testRNumber)
-# roomList.append(room6)
-window1.buildItems(roomList)
+# roomList = []
+# for building, roomnum, capacity in cursor.fetchall():
+#     roomList.append(Room(building, str(roomnum) , str(capacity)) )
 
-interface.mainloop()
+# # testRNumber = input("Room Number: ")
+# # room6 = Room(testBuilding,testRNumber)
+# # roomList.append(room6)
+# window1.buildItems(roomList)
+
+# interface.mainloop()

@@ -1,3 +1,10 @@
+findIndexRooms = """
+select MAX(roomID) from rooms;
+"""
+findIndexEvents = """
+select MAX(resID) from events;
+"""
+
 queryClearEvents = """
 DROP TABLE IF EXISTS classes CASCADE ;
 DROP TABLE IF EXISTS events CASCADE;
