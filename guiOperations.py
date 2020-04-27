@@ -8,6 +8,9 @@ def searchDB(self, keywords,searchRooms,searchEvents):
     roomList = []
 
     #TESTING
+    roomList.clear()
+    roomTest = Room("ENG","202",200)
+    roomList.append(roomTest)
     roomTest = Room("ENG","202",200)
     roomList.append(roomTest)
     #end testing

@@ -5,5 +5,6 @@ def selectFile(self,fileName):
 
 def addFile(self,fileName,fileType):
         f = open(fileName,'r')
-        fType = fileType;
-        #pass data to 
+        fType = fileType;       #0 for room list, 1 for event list,see examples provided for format
+
+        #parse data into proper fields, send to database

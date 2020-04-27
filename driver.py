@@ -21,13 +21,8 @@ event1 = Events("CMSC","100"," ","01","Professor X","MW1",200)
 
 
 room5.addEvent(1,event1)
-event2 = Events("BIO","110"," ","02"," ","TTH2",50)
-print(event2.getSubject()+" "+event2.getCourseNum())
-event2.getSubject()
-print("DEBUG")
-print("DEBUG")
-print(room5.getEvent(1).getSubject()+" "+event2.getCourseNum())
-
+event2 = Events("CMSC","447"," ","01","Kartchner","MW10",30)
+room5.addEvent(27,event2)
 roomList = [room1,room2,room3,room4,room5]
 
 interface = Tk()

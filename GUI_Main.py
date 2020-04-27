@@ -83,6 +83,14 @@ class GUI_Main:
         self.buildItems(roomList,0,0)
   
     def buildItems(self,roomList,startTime,endTime):
+        #Cleans frame, incase there are items in it:
+        for widget in self.frame_classes.winfo_children():
+            widget.destroy()
+        for widget in self.frame_times.winfo_children():
+            widget.destroy()
+        for widget in self.frame_rooms.winfo_children():
+            widget.destroy()
+
         sTime = 0 + startTime #starts at 0, max eTime
         eTime = 28 - endTime  #starts at max of roomList timeslots, should be 28, min sTime
         #NO ERROR CHECKING, please do error checing before calling buildItems
@@ -98,6 +106,7 @@ class GUI_Main:
         flag = 0
         timeDisplay = 8.0 #start at 8 AM
         for item in roomList:
+            print("item %d",i)
             self.label_room = Label(self.frame_rooms,text = item.getRoomName(), font = self.font_DisplayItems,width = self.gridWidth,height = self.gridHeight,bd = 2,relief= "groove")
             self.label_room.grid(row=0 ,column = i, sticky = W)
             i = i + 1
@@ -224,7 +233,9 @@ class GUI_Main:
         self.buildItems(roomList,sTime,eTime)
 
     def buildEventInfoFrame(self,master,displayEvent):
-        print("Updated Event Info")
+        for widget in master.winfo_children():
+            widget.destroy()
+
         self.label_eventInfo_courseName = Label(master,text="Course Name: " +displayEvent.getSubject() + " "+ displayEvent.getCourseNum())
         self.label_eventInfo_section = Label(master,text="Section: "+displayEvent.getSection())
         self.label_eventInfo_instructor = Label(master,text="Instructor: "+displayEvent.getInstructor())
