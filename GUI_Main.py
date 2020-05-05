@@ -10,6 +10,7 @@ from tkinter.font import Font
 from PIL import Image, ImageTk
 import fileOperations as fOp
 import guiOperations as gOp
+#import guiOpTest as gOp
 from Room import Room
 from Events import Events
 
