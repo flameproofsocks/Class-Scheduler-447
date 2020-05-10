@@ -1,0 +1,115 @@
+CREATE OR REPLACE PROCEDURE add_class (
+
+    p_room_num        tbl_room.room_num%TYPE,
+    p_period_start    tbl_period.period_start%TYPE,
+    p_week_days       tbl_period.week_days%TYPE,
+    p_first_name      tbl_prof.first_name%TYPE,
+    p_last_name       tbl_prof.last_name%TYPE)
+IS
+    v_period_id   tbl_period.period_id%TYPE;
+    v_week_days   tbl_period.week_days%TYPE;
+    v_room_id     tbl_room.room_id%TYPE;
+    v_prof_id     tbl_prof.prof_id%TYPE;
+    v_prof_id2    tbl_prof.prof_id%TYPE;
+    v_room_id2    tbl_prof.prof_id%TYPE;
+    b_add_class   BOOLEAN := FALSE;
+
+BEGIN
+
+    -- Validate that the passed in set exists in the databases
+    SELECT room_id INTO v_room_id FROM tbl_room
+     WHERE room_num = p_room_num;
+
+    SELECT period_id INTO v_period_id FROM tbl_period
+     WHERE period_start = p_period_start AND week_days = p_week_days;
+
+    SELECT prof_id INTO v_prof_id FROM tbl_prof
+     WHERE first_name = p_first_name AND last_name = p_last_name;
+ 
+     -- If the professor, room, or class time period exist
+    IF     v_room_id IS NOT NULL
+       AND v_period_id IS NOT NULL
+       AND v_prof_id IS NOT NULL
+    THEN -- Then check for a collision of data
+        SELECT 9 INTO v_room_id2 FROM DUAL -- is room available
+         WHERE NOT EXISTS
+                   (SELECT * FROM tbl_class
+                     WHERE room_id = v_room_id AND period_id = v_period_id); -- Make sure room is not in use
+ 
+        SELECT 9 INTO v_prof_id2 FROM DUAL
+         WHERE NOT EXISTS
+                   (SELECT * FROM tbl_class
+                     WHERE prof_id = v_prof_id AND period_id = v_period_id); -- Make sure professor is available
+ 
+        IF v_room_id2 = 9 AND v_prof_id2 = 9 -- If there was no collision
+        THEN
+            b_add_class := TRUE; -- adding the class is okay
+        END IF;
+    END IF;
+
+    IF b_add_class = TRUE
+    THEN
+        INSERT INTO tbl_class
+             VALUES (v_room_id, v_period_id, v_prof_id);
+    ELSE
+        -- do nothing
+    END IF;
+EXCEPTION
+    WHEN OTHERS
+    THEN
+        -- there could be another problem?
+END;
+ 
+DROP SEQUENCE seq_room;
+DROP TABLE tbl_room;
+DROP SEQUENCE seq_prof;
+DROP TABLE tbl_prof;
+DROP SEQUENCE seq_period;
+DROP TABLE tbl_period;
+DROP TABLE tbl_class;
+ 
+CREATE TABLE tbl_room
+(
+    room_id    INT NOT NULL,
+    room_num   VARCHAR2 (10)
+);
+ 
+CREATE TABLE tbl_prof
+(
+    prof_id      INT NOT NULL,
+    first_name   VARCHAR2 (30),
+    last_name    VARCHAR2 (30)
+);
+ 
+CREATE TABLE tbl_period
+(
+    period_id      INT NOT NULL,
+    period_start   VARCHAR2 (10),
+    period_end     VARCHAR2 (10),
+    week_days      VARCHAR2 (5)
+);
+ 
+CREATE TABLE tbl_class
+(
+    room_id     INT NOT NULL,
+    prof_id     INT NOT NULL,
+    period_id   INT NOT NULL
+);
+ 
+CREATE SEQUENCE seq_room INCREMENT BY 1 MINVALUE 1;
+CREATE SEQUENCE seq_prof INCREMENT BY 1 MINVALUE 1;
+CREATE SEQUENCE seq_period INCREMENT BY 1 MINVALUE 1;
+
+
+INSERT INTO tbl_room VALUES (seq_room.NEXTVAL, '300A'); 
+INSERT INTO tbl_room VALUES (seq_room.NEXTVAL, '500B');
+INSERT INTO tbl_room VALUES (seq_room.NEXTVAL, '600C'); 
+INSERT INTO tbl_prof VALUES (seq_prof.NEXTVAL, 'John1', 'Doe1');
+INSERT INTO tbl_prof VALUES (seq_prof.NEXTVAL, 'John2', 'Doe2'); 
+INSERT INTO tbl_prof VALUES (seq_prof.NEXTVAL, 'John3', 'Doe3');
+INSERT INTO tbl_period VALUES (seq_period.NEXTVAL, '8:00AM', '8:50AM','1');
+INSERT INTO tbl_period VALUES (seq_period.NEXTVAL, '8:00AM', '8:50AM','0');
+INSERT INTO tbl_period VALUES (seq_period.NEXTVAL, '9:00AM', '9:50AM','1');
+INSERT INTO tbl_period VALUES (seq_period.NEXTVAL, '9:00AM', '9:50AM','0');
+INSERT INTO tbl_period VALUES (seq_period.NEXTVAL, '10:00AM', '10:50AM','1');
+INSERT INTO tbl_period VALUES (seq_period.NEXTVAL, '10:00AM', '10:50AM','0');
