@@ -25,7 +25,9 @@ def searchDB(self, keywords,searchRooms,searchEvents):
 
     #TESTING
     
-    query1 = "select roomid, building, roomnum, capacity from rooms where roomnum = " + str(keywords.get())
+    searchKeywords = str(keywords.get()).split()
+
+    query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[0] + "' or building = '" + searchKeywords[0] + "'"
     cursor.execute(query1)
 
     idList = []
@@ -33,6 +35,15 @@ def searchDB(self, keywords,searchRooms,searchEvents):
         roomList.append(Room(building, str(roomnum) , str(capacity)) )
         idList.append(roomid)
     #end testing
+
+    if(len(searchKeywords) > 1):
+        query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[1] + "' or building = '" + searchKeywords[1] + "'"
+        cursor.execute(query1)
+
+        for roomid, building, roomnum, capacity in cursor.fetchall():
+            roomList.append(Room(building, str(roomnum) , str(capacity)) )
+            idList.append(roomid)
+        #end testing
 
     j = 1
     cursor2 = connection.cursor()
