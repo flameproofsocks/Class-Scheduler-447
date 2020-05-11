@@ -24,26 +24,38 @@ def searchDB(self, keywords,searchRooms,searchEvents):
     roomList = []
 
     #TESTING
-    
-    searchKeywords = str(keywords.get()).split()
-
-    query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[0] + "' or building = '" + searchKeywords[0] + "'"
-    cursor.execute(query1)
-
     idList = []
+    if str(keywords.get()) == "":
+        query1 = "select roomid, building, roomnum, capacity from rooms"
+        cursor.execute(query1)
+    else:
+        searchKeywords = str(keywords.get()).split()
+        if(len(searchKeywords) > 1):
+            query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[0] + "' and building = '" + searchKeywords[1] + "'"
+            cursor.execute(query1)
+            for roomid, building, roomnum, capacity in cursor.fetchall():
+                roomList.append(Room(building, str(roomnum) , str(capacity)) )
+                idList.append(roomid)
+            query2 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[1] + "' and building = '" + searchKeywords[0] + "'"
+            cursor.execute(query2)
+            #cursor.execute(query1)
+        else:
+            query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[0] + "' or building = '" + searchKeywords[0] + "'"
+            cursor.execute(query1)
+
     for roomid, building, roomnum, capacity in cursor.fetchall():
         roomList.append(Room(building, str(roomnum) , str(capacity)) )
         idList.append(roomid)
     #end testing
 
-    if(len(searchKeywords) > 1):
-        query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[1] + "' or building = '" + searchKeywords[1] + "'"
-        cursor.execute(query1)
+    # if(len(searchKeywords) > 1):
+    #     query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[1] + "' or building = '" + searchKeywords[1] + "'"
+    #     cursor.execute(query1)
 
-        for roomid, building, roomnum, capacity in cursor.fetchall():
-            roomList.append(Room(building, str(roomnum) , str(capacity)) )
-            idList.append(roomid)
-        #end testing
+    #     for roomid, building, roomnum, capacity in cursor.fetchall():
+    #         roomList.append(Room(building, str(roomnum) , str(capacity)) )
+    #         idList.append(roomid)
+    #     #end testing
 
     j = 1
     cursor2 = connection.cursor()
