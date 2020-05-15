@@ -62,7 +62,7 @@ DROP TABLE IF EXISTS classes CASCADE ;
 DROP TABLE IF EXISTS events CASCADE;
 CREATE TABLE events (
 	resID integer NOT NULL,
-	eventName varchar(30),
+	eventName text,
 	courseNum varchar(30), --this can be a string, might be “100L”
 	days int, -- days of the week as binary - 10101 (mwf) 
 	startTime time,
@@ -78,16 +78,20 @@ CREATE TABLE events (
 """
 
 queryLoadRooms = """
-INSERT INTO rooms VALUES(1, 'ILSB Building', 118, 30, 'Classroom') ON CONFLICT DO NOTHING;
-INSERT INTO rooms VALUES(2, 'Bio', 201, 30, 'Classroom') ON CONFLICT DO NOTHING;
+INSERT INTO rooms VALUES(1, 'ILSB', 118, 30, 'Classroom') ON CONFLICT DO NOTHING;
+INSERT INTO rooms VALUES(2, 'Chem', 30, 200, 'Classroom') ON CONFLICT DO NOTHING;
 
 INSERT INTO rooms VALUES(3, 'Bio', 202, 30, 'Classroom') ON CONFLICT DO NOTHING;
 
-INSERT INTO rooms VALUES(4, 'Math', 201, 30, 'Classroom') ON CONFLICT DO NOTHING;
+INSERT INTO rooms VALUES(4, 'ITE', 201, 60, 'Classroom') ON CONFLICT DO NOTHING;
 
 INSERT INTO rooms VALUES(5, 'Math', 202, 30, 'Classroom') ON CONFLICT DO NOTHING;
 
 INSERT INTO rooms VALUES(6, 'Math', 301, 30, 'Classroom') ON CONFLICT DO NOTHING;
 
 
+"""
+
+queryLoadProf = """
+INSERT INTO prof VALUES(1, 'John', 'Smith', 'Chalk Allergy', 'www.website.com', 'A generic teacher, hates chalk, talks loudly, students still fall asleep' ) ON CONFLICT DO NOTHING;
 """

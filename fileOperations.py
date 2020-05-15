@@ -10,6 +10,27 @@
 #         #parse data into proper fields, send to database
 
 from tkinter import filedialog
+import DBqueries
+
+import psycopg2
+import psycopg2.extensions
+import os
+
+from Room import Room
+from Events import Events
+
+connection = psycopg2.connect(user = "postgres",
+                                  password = "software447",
+                                  host = "database447.cst3jimtz2ge.us-east-2.rds.amazonaws.com",
+                                  port = "5432",
+                                  database = "ClassScheduler")
+
+                                  
+#setup database
+connection.autocommit = True
+cursor = connection.cursor()
+
+
 
 DEPART = 0
 COURSE_NUM = 1
@@ -131,6 +152,7 @@ def sPrint(x):
 # Extracts all columns of data in the CSV file data for schedule
 def scheduleExtractor(sch):
 
+    print("EXtracing schedule:\n ", sch)
     #DEPART = 0
     #COURSE_NUM = 1
     #COURSE_NAME = 2
@@ -182,8 +204,9 @@ def roomExtractor(rm):
         rooms.append(rm[i][ROOM])
         capacities.append(rm[i][CAPACITY])
 
-    rooms.pop(0)
-    capacities.pop(0)
+    if len(rooms) > 0:
+        rooms.pop(0)
+        capacities.pop(0)
 
     
     return rooms, capacities
@@ -193,24 +216,76 @@ def timePrep(times):
     errorCount = 0
     days = []
     time = []
+    eTime = "0000"
+    sTime = "0000"
 
     for i in times:
-        if i[:3] == "MWF":
+        if i[:3] == "MWF" or i[:3] == "mwf":
             days.append(MWF)
-            time.append(i[3:])
-        elif i[:2] == "mw":
+            sTime = str(i[3:])
+            if len(sTime) > 2:
+                eTime = str( int(sTime) + 50 )
+            else:
+                eTime = str( int(sTime)*100 + 50 )
+        elif i[:2] == "mw" or i[:2] == "MW":
             days.append(MW)
-            time.append(i[2:])
-        elif i[:2] == "tt":
+            sTime = str(i[2:])
+            if len(sTime) > 2:
+                eTime = str( int(sTime) +115 )
+            else:
+                eTime = str( int(sTime)*100 + 115)
+        elif i[:2] == "tt" or i[:2] == "TT":
             days.append(TT)
-            time.append(i[2:])
+            sTime = str(i[2:])
+            if len(sTime) > 2:
+                eTime = str( int(sTime) + 115 )
+            else:
+                eTime = str( int(sTime)*100 + 115 )
+        
         else:
             errorCount += 1
             print("Format error - dropped", errorCount, "from addition")
-            days.append('')
-            time.append('')
+            days.append('00:00')
+            time.append('00:00')
 
+        print("StartTime ", sTime, " EndTime ", eTime, "\n")
 
+        #sTime = str(i)
+        
+        #deciding the times in 00:00 format
+        if(len(sTime) == 1): #ex: 4 o clock
+            sh = "0" + sTime    
+        elif(len(sTime) == 2): #ex: 10 o clock
+            sh = sTime
+        elif(len(sTime) == 3): #ex: 4:30/430
+            sh = "0" + sTime[0]
+            sm =  sTime[1:]
+        elif(len(sTime) == 4): #ex: 1130
+            sh = sTime[:1]
+            sm = sTime[2:]
+        else: 
+            sh = "00"
+            sm = "00" 
+
+        if(len(eTime) == 1): #ex: 4 o clock
+            eh = "0" + eTime
+        elif(len(eTime) == 2): #ex: 10 o clock
+            eh = eTime
+        elif(len(eTime) == 3): #ex: 4:30/430
+            eh = "0" + eTime[0]
+            em = eTime[1:]
+        elif(len(eTime) == 4): #ex: 1130
+            eh = eTime[:1]
+            em = eTime[2:]
+        else: 
+            eh = "00"
+            em = "00" 
+
+        if(int(sh) < 8 and int(sh) != 0): #this means it's pm and needs military time adjustment
+            sh = str( int(sh) + 12) 
+            eh = str( int(eh) + 12)
+
+        time.append([sh+ ":"+sm,eh+":"+em])     
 
     return days, time
 
@@ -291,24 +366,67 @@ def selectFile(self,fileName):
 def addFile(self,fileName,fileType):
     print("DEBUG: FILENAME: ", fileName)
     f = open(fileName,'r')
-    f.read()
+    #f.read()
     fType = fileType    #0 for room list, 1 for event list,see examples provided for format
     
     #parse data into proper fields, send to database
+    times = []
+    instructors = []
     
-    if fType == 1:
+    if fType == 0: #reading class list
+        print("CLASS LIST")
         buff = f.readlines()
         schedule = []
         for line in buff:
+            print("i")
             schedule.append(scheduleRead(line, ','))
+        print("The schedule: ", schedule)
         departments, course_nums, course_names, sec_names, sections, instructors, times, capacitiesS = scheduleExtractor(schedule)
-        
-    elif fType == 0:
+
+        #setup times
+        days, time = timePrep(times)
+        print("TIMES\n\n", time)
+
+        #code to add into database
+        cursor.execute(DBqueries.queryClearAll)
+        cursor.execute(DBqueries.queryLoadRooms)
+        cursor.execute(DBqueries.queryLoadProf) 
+        #Example:   
+        #INSERT INTO events VALUES(1, 'Bio', '101', 10100, '10:00:00', '11:15:00', 'Generic Class', 1, 1) ON CONFLICT DO NOTHING;
+
+        #Adding classes
+        for i in range(len(departments)):
+            #a complicated query to find an open room.
+            roomIQuery = ("Select roomID from rooms where capacity >= " + str(capacitiesS[i]) + " and roomID not IN (SELECT roomID from events where '" 
+            + str(time[i][0]) + ":00' <= endTime and '"+ str(time[i][0]) +":00' >= startTime) ORDER BY capacity desc LIMIT 1")
+            cursor.execute(roomIQuery)
+            try:
+                roomIndex = cursor.fetchone()[0]
+            except:
+                print("No rooms")
+            print("DEBUG ROOM IDEX: ", roomIndex)
+            print("DEBUG roomIndex Query: \n", roomIQuery)
+
+            query1 = ("INSERT INTO events VALUES("+ str(i) + " , '"+ str(course_names[i]) + "', '" + str(course_nums[i]) +"', " + str(days[i])+", "
+            "'"+ str(time[i][0]) +":00', '" + str(time[i][1])  +":00', 'Generic Class', " + str(roomIndex) +", 1) ON CONFLICT DO NOTHING;"
+            )
+            if roomIndex == None:
+                print("Room can't fit? ", query1)
+            else:
+                query1 = ("INSERT INTO events VALUES("+ str(i) + " , '"+ str(course_names[i]) + "', '" + str(course_nums[i]) +"', " + str(days[i])+", "
+                "'"+ str(time[i][0]) +":00', '" + str(time[i][1])  +":00', 'Generic Class', " + str(roomIndex) +", 1) ON CONFLICT DO NOTHING;"
+                )
+                cursor.execute(query1)
+
+
+    elif fType == 1: #reading room list
+        print("Room lsit")
         buff = f.readlines()
         rm = []
         for line in buff:
             rm.append(roomRead(line, ','))
         rooms, capacitiesR = roomExtractor(rm)
+        
 
 
     else:
@@ -326,16 +444,13 @@ def addFile(self,fileName,fileType):
     lnames, fnames = nameFinder(instructors)
 
     # Completely unnecessary to use but it is available if it facilitates anything
-    '''
-    for i in range(len(departments)):
-        final_schedule.append([departments[i], course_nums[i], course_names[i], sec_names[i], sections[i], instructors[i], days[i], time[i], capacitiesS[i]])
+    #'''
+    # for i in range(len(departments)):
+    #     final_schedule.append([departments[i], course_nums[i], course_names[i], sec_names[i], sections[i], instructors[i], days[i], time[i], capacitiesS[i]])
 
-    for j in range(len(rooms)):
-        final_rooms.append([rooms[j],capacitiesR[j]])
+    #for j in range(len(rooms)):
+    #    final_rooms.append([rooms[j],capacitiesR[j]])
 
-    print(final_schedule)
-    print(final_rooms)
-    '''
 
     ##############################################################
     #                     STATUS REPORT                          #

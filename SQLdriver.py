@@ -55,6 +55,11 @@ for roomid, building, roomnum, capacity in cursor.fetchall():
     idList.append(roomid)
 
 
+print("DEBUGGING: ")
+cursor.execute("select * from Events")
+print(cursor.fetchall())
+
+#EVENTS
 # self.subject = arg1
 # self.courseNum = arg2
 # self.version = arg3
@@ -68,13 +73,14 @@ for roomid, building, roomnum, capacity in cursor.fetchall():
 j = 1
 cursor2 = connection.cursor()
 for i in range(len(roomList)):
-    query1 = "Select resID, eventName, courseNum, profID from events where roomID = " + str(idList[i]) 
+    query1 = "Select resID, eventName, courseNum, profID, startTime from events where roomID = " + str(idList[i]) + " Limit 14"
     cursor2.execute(query1)
-    for resID, eventName, courseNum, profID in cursor2.fetchall():
-        roomList[i].addEvent(j,Events(eventName, courseNum," ","02",profID,"TTH1",50))
+    j = 1
+    for resID, eventName, courseNum, profID, startTime in cursor2.fetchall():
+        timeSlot = (int(str(startTime)[:2]) - 8)*2 // 1
+        roomList[i].addEvent(j,Events(str(startTime)[:4] + str(timeSlot), courseNum," ","02",profID,"TTH" + str(timeSlot) ,50))
         j += 1 #index for adding events
     
-
 
 interface = Tk()
 interface.geometry("800x600")
@@ -98,21 +104,3 @@ if(window1.entry_addEvent_subject.get() != ""):
     nextID = int(cursor.fetchone()[0] ) + 1 #next index
     query1 = "INSERT INTO events VALUES("+str(nextID)+", '"+ str(window1.entry_addEvent_subject.get()) + "', '" + str(window1.entry_addEvent_courseNum.get()) + "', 10101, '10:00:00', '11:15:00', 'Class from UI', " + str(window1.entry_addEvent_instructor.get()) +", 1) ON CONFLICT DO NOTHING;"
     cursor.execute(query1)
-
-# if(window1.entry_search_building.get() != ""):
-#     query1 = "Select building, roomnum from rooms where building = '" + str(window1.entry_search_building.get())+"' and roomnum = '"+ str(window1.entry_search_num.get()) + "';"
-#     cursor.execute(query1)
-# else:
-#     query1 = "select building, roomnum, capacity from rooms"
-#     cursor.execute(query1)
-
-# roomList = []
-# for building, roomnum, capacity in cursor.fetchall():
-#     roomList.append(Room(building, str(roomnum) , str(capacity)) )
-
-# # testRNumber = input("Room Number: ")
-# # room6 = Room(testBuilding,testRNumber)
-# # roomList.append(room6)
-# window1.buildItems(roomList)
-
-# interface.mainloop()
