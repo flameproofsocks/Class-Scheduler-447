@@ -22,28 +22,29 @@ def searchDB(self, keywords,searchRooms,searchEvents):
     #search events for keywords is searchEvents = 1
     #place correct itmes in roomList
     roomList = []
+    print ("DEBUG: ", searchEvents.get())
 
     #TESTING
     idList = []
-    if str(keywords.get()) == "":
+    searchKeywords = str(keywords.get()).split()
+    if str(keywords.get()) == "" or searchRooms.get() == 0:
         query1 = "select roomid, building, roomnum, capacity from rooms"
         cursor.execute(query1)
-    else:
-        searchKeywords = str(keywords.get()).split()
+    elif searchRooms.get() == 1:
         if(len(searchKeywords) > 1):
-            query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[0] + "' and building = '" + searchKeywords[1] + "'"
+            query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) ILIKE '%" + searchKeywords[0] + "' and building ILIKE '%" + searchKeywords[1] + "%'"
             cursor.execute(query1)
             for roomid, building, roomnum, capacity in cursor.fetchall():
                 roomList.append(Room(building, str(roomnum) , str(capacity)) )
                 idList.append(roomid)
-            query2 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[1] + "' and building = '" + searchKeywords[0] + "'"
+            query2 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) ILIKE '%" + searchKeywords[1] + "%' and building ILIKE '%" + searchKeywords[0] + "%'"
             cursor.execute(query2)
             #cursor.execute(query1)
         else:
-            query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) = '" + searchKeywords[0] + "' or building = '" + searchKeywords[0] + "'"
+            query1 = "select roomid, building, roomnum, capacity from rooms where CAST (roomnum AS text) ILIKE '%" + searchKeywords[0] + "%' or building ILIKE '%" + searchKeywords[0] + "%'"
             cursor.execute(query1)
 
-    for roomid, building, roomnum, capacity in cursor.fetchall():
+    for roomid, building, roomnum, capacity in cursor.fetchall():   
         roomList.append(Room(building, str(roomnum) , str(capacity)) )
         idList.append(roomid)
     #end testing
@@ -60,7 +61,13 @@ def searchDB(self, keywords,searchRooms,searchEvents):
     j = 1
     cursor2 = connection.cursor()
     for i in range(len(roomList)):
-        query1 = "Select resID, eventName, courseNum, profID from events where roomID = " + str(idList[i]) 
+        if searchEvents.get() == 1:
+            if len(searchKeywords) > 1:
+                query1 = "Select resID, eventName, courseNum, profID from events where roomID = " + str(idList[i]) + " AND ( eventName ILIKE '%" + searchKeywords[0] + "%' OR eventName ILIKE '%" + searchKeywords[1] + "%' )"
+            else:
+                query1 = "Select resID, eventName, courseNum, profID from events where roomID = " + str(idList[i]) + " AND eventName ILIKE '%" + keywords.get() + "%'"
+        else:
+            query1 = "Select resID, eventName, courseNum, profID from events where roomID = " + str(idList[i])
         cursor2.execute(query1)
         for resID, eventName, courseNum, profID in cursor2.fetchall():
             roomList[i].addEvent(j,Events(eventName, courseNum," ","02",profID,"TTH1",50))
