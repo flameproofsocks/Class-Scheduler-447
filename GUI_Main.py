@@ -152,10 +152,10 @@ class GUI_Main:
         self.fileType = 0 #0 for room list, 1 for class list
         self.button_selectFile = Button(master,text="Select File",command=lambda: fOp.selectFile(self,self.fileName))
         self.label_fileType = Label(master,text="Select File Type:")
-        self.rbutton_fileType1 = Radiobutton(master,text="Room List",variable=self.fileType, value = 1)
-        self.rbutton_fileType2 = Radiobutton(master,text="Class List",variable=self.fileType, value = 2)
-        self.button_addFile = Button(master,text="Add Selected File",command=lambda: fOp.addFile(self,self.fileName,self.fileType))
-
+        self.rbutton_fileType1 = Radiobutton(master,text="Room List",variable=self.fileType, value = 0)
+        self.rbutton_fileType2 = Radiobutton(master,text="Class List",variable=self.fileType, value = 1)
+        self.button_addFile = Button(master,text="Add Selected File",command=lambda:  fOp.addFile(self,self.fileName,self.fileType ) )
+        #fOp.addFile(self,self.fileName,self.fileType
         self.button_selectFile.grid(row=1)
         self.label_fileType.grid(row=2)
         self.rbutton_fileType1.grid(row=3)

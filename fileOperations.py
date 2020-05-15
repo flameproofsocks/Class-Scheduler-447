@@ -285,22 +285,25 @@ def nameFinderdbg(names):
 
 
 def selectFile(self,fileName):
-    fileName = filedialog.askopenfilename()
+    #fileName = filedialog.askopenfilename()
+    self.fileName = filedialog.askopenfilename()
 
 def addFile(self,fileName,fileType):
+    print("DEBUG: FILENAME: ", fileName)
     f = open(fileName,'r')
-    fType = fileType;       #0 for room list, 1 for event list,see examples provided for format
+    f.read()
+    fType = fileType    #0 for room list, 1 for event list,see examples provided for format
     
     #parse data into proper fields, send to database
     
-    if fType.lower() == "e" or fType.lower() == "events":
+    if fType == 1:
         buff = f.readlines()
         schedule = []
         for line in buff:
             schedule.append(scheduleRead(line, ','))
         departments, course_nums, course_names, sec_names, sections, instructors, times, capacitiesS = scheduleExtractor(schedule)
         
-    elif fType.lower() == "r" or fType.lower() == "rooms":
+    elif fType == 0:
         buff = f.readlines()
         rm = []
         for line in buff:
