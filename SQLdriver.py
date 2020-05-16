@@ -78,7 +78,7 @@ for i in range(len(roomList)):
     j = 1
     for resID, eventName, courseNum, profID, startTime in cursor2.fetchall():
         timeSlot = (int(str(startTime)[:2]) - 8)*2 // 1
-        roomList[i].addEvent(j,Events(str(startTime)[:4] + str(timeSlot), courseNum," ","02",profID,"TTH" + str(timeSlot) ,50))
+        roomList[i].addEvent(j,Events(str(startTime)[:4] +"-" + str(timeSlot), courseNum," ","02",profID,"TTH" + str(timeSlot) ,50))
         j += 1 #index for adding events
     
 
