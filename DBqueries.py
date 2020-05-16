@@ -95,3 +95,45 @@ INSERT INTO rooms VALUES(6, 'Math', 301, 30, 'Classroom') ON CONFLICT DO NOTHING
 queryLoadProf = """
 INSERT INTO prof VALUES(1, 'John', 'Smith', 'Chalk Allergy', 'www.website.com', 'A generic teacher, hates chalk, talks loudly, students still fall asleep' ) ON CONFLICT DO NOTHING;
 """
+
+import psycopg2
+import psycopg2.extensions
+import os
+
+# connection = psycopg2.connect(user = "postgres",
+#                                   password = "bippy",
+#                                   host = "localhost",
+#                                   port = "5432",
+#                                   database = "447ver1")
+
+connection = psycopg2.connect(user = "postgres",
+                                  password = "software447",
+                                  host = "database447.cst3jimtz2ge.us-east-2.rds.amazonaws.com",
+                                  port = "5432",
+                                  database = "ClassScheduler")
+
+                                  
+#setup database
+connection.autocommit = True
+cursor = connection.cursor()
+
+#INSERT INTO prof VALUES(1, 'John', 'Smith', 'Chalk Allergy', 'www.website.com', 'students fall asleep' ) ON CONFLICT DO NOTHING;
+#A function that returns the professor ID of a professor and adds it if necessary
+def findProfessor( lastName, name):
+	print("BRUH THIS FUNCTION")
+	returnID = 1
+	cursor.execute("Select profID from prof where fName ILIKE '%" + name + "%' and lName ILIKE '%" + lastName + "%' ")
+	try:
+		returnID = cursor.fetchone()[0]
+	except:
+		print("EXCEPT?")
+		index = 1
+		try:
+			index = 1 + cursor.execute("select MAX(profID) from prof;")
+		except:
+			print("First Professor (likely)")
+		cursor.execute("INSERT INTO prof VALUES("+ str(index)+ ", '" + name+"', '" + lastName+"', 'Chalk Allergy', 'www.website.com', 'students fall asleep' ) ON CONFLICT DO NOTHING;")
+		print("ADDED PROF#: ", index)
+		return index
+	print("BRUHHHH")
+	return returnID

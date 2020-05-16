@@ -30,6 +30,8 @@ connection = psycopg2.connect(user = "postgres",
 connection.autocommit = True
 cursor = connection.cursor()
 
+EXTRA_TIMES = ["08:30", "09:45", "10:00", "11:15"]
+EXTRA_TIMES_MWF = ["09:00", "09:50","10:00", "10:50","11:00", "11:50"]
 
 DEPART = 0
 COURSE_NUM = 1
@@ -247,7 +249,7 @@ def timePrep(times):
             days.append('00:00')
             time.append('00:00')
 
-        print("StartTime ", sTime, " EndTime ", eTime, "\n")
+        #print("StartTime ", sTime, " EndTime ", eTime, "\n")
 
         ################################################
         #sh is the starting hour
@@ -386,6 +388,7 @@ def addFile(self,fileName,fileType):
             schedule.append(scheduleRead(line, ','))
         print("The schedule: ", schedule)
         departments, course_nums, course_names, sec_names, sections, instructors, times, capacitiesS = scheduleExtractor(schedule)
+        lnames, fnames = nameFinder(instructors)
 
         #setup times
         days, time = timePrep(times)
@@ -394,12 +397,13 @@ def addFile(self,fileName,fileType):
         #code to add into database
         # cursor.execute(DBqueries.queryClearAll)
         # cursor.execute(DBqueries.queryLoadRooms)
-        cursor.execute(DBqueries.queryLoadProf) 
+        #cursor.execute(DBqueries.queryLoadProf) 
         #Example:   
         #INSERT INTO events VALUES(1, 'Bio', '101', 10100, '10:00:00', '11:15:00', 'Generic Class', 1, 1) ON CONFLICT DO NOTHING;
 
         #Adding classes
         for i in range(len(departments)):
+            roomIndex = None
             #a complicated query to find an open room.
             roomIQuery = ("Select roomID from rooms where capacity >= " + str(capacitiesS[i]) + " and roomID not IN (SELECT roomID from events where '" 
             + str(time[i][0]) + ":00' <= endTime and '"+ str(time[i][0]) +":00' >= startTime) ORDER BY capacity desc LIMIT 1")
@@ -407,10 +411,48 @@ def addFile(self,fileName,fileType):
             try:
                 roomIndex = cursor.fetchone()[0]
             except:
-                print("No rooms")
-            print("DEBUG ROOM IDEX: ", roomIndex)
-            print("DEBUG roomIndex Query: \n", roomIQuery)
+                print("No rooms?")  
+                j = 0
+                if days[i] == "10101":
+                    while j < (len(EXTRA_TIMES_MWF) - 1):
+                        roomIQuery = ("Select roomID from rooms where capacity >= " + str(capacitiesS[i]) + " and roomID not IN (SELECT roomID from events where '" 
+                        + EXTRA_TIMES_MWF[j] + ":00' <= endTime and '"+ EXTRA_TIMES_MWF[j] +":00' >= startTime) ORDER BY capacity desc LIMIT 1")
+                        cursor.execute(roomIQuery)
+                        j = j + 10 #kicks you out of the loop
 
+                        try:
+                            roomIndex = cursor.fetchone()[0]
+                        except:
+                            print("Second check failed")
+                            j = j - 8
+                        if roomIndex != None:
+                            print("MWF room: ", j)
+                            time[i][0] = EXTRA_TIMES_MWF[j-10]
+                            time[i][1] = EXTRA_TIMES_MWF[j-9]
+                            j = 99
+
+                else:
+                    while j < (len(EXTRA_TIMES) - 1):
+                        roomIQuery = ("Select roomID from rooms where capacity >= " + str(capacitiesS[i]) + " and roomID not IN (SELECT roomID from events where '" 
+                        + EXTRA_TIMES[j] + ":00' <= endTime and '"+ EXTRA_TIMES[j] +":00' >= startTime) ORDER BY capacity desc LIMIT 1")
+                        cursor.execute(roomIQuery)
+                        j = j + 10 #kicks you out of the loop
+                        try:
+                            roomIndex = cursor.fetchone()[0]
+                        except:
+                            print("Second check failed")
+                            j = j - 8
+                        if roomIndex != None:
+                            print("Room found: ", j)
+                            time[i][0] = EXTRA_TIMES[j-10]
+                            time[i][1] = EXTRA_TIMES[j-9]
+                            j = 99
+
+            #Find the professor
+            profIndex = DBqueries.findProfessor(lnames[i], fnames[i])
+            print("Returned profI: ", profIndex)
+
+            #Insert the Event
             query1 = ("INSERT INTO events VALUES("+ str(i) + " , '"+ str(course_names[i]) + "', '" + str(course_nums[i]) +"', " + str(days[i])+", "
             "'"+ str(time[i][0]) +":00', '" + str(time[i][1])  +":00', 'Generic Class', " + str(roomIndex) +", 1) ON CONFLICT DO NOTHING;"
             )
@@ -418,7 +460,7 @@ def addFile(self,fileName,fileType):
                 print("Room can't fit? ", query1)
             else:
                 query1 = ("INSERT INTO events VALUES("+ str(i) + " , '"+ str(course_names[i]) + "', '" + str(course_nums[i]) +"', " + str(days[i])+", "
-                "'"+ str(time[i][0]) +":00', '" + str(time[i][1])  +":00', 'Generic Class', " + str(roomIndex) +", 1) ON CONFLICT DO NOTHING;"
+                "'"+ str(time[i][0]) +":00', '" + str(time[i][1])  +":00', 'Generic Class', " + str(roomIndex) +", " + str(profIndex) +") ON CONFLICT DO NOTHING;"
                 )
                 cursor.execute(query1)
 
@@ -430,7 +472,7 @@ def addFile(self,fileName,fileType):
         for line in buff:
             rm.append(roomRead(line, ','))
         rooms, capacitiesR = roomExtractor(rm)
-        print("Testing Capacities", capacitiesR)
+        #print("Testing Capacities", capacitiesR)
 
         #code to add into database
         cursor.execute(DBqueries.queryClearAll)

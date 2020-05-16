@@ -56,7 +56,7 @@ for roomid, building, roomnum, capacity in cursor.fetchall():
 
 
 print("DEBUGGING: ")
-cursor.execute("select * from Events")
+cursor.execute("select * from prof")
 print(cursor.fetchall())
 
 #EVENTS
