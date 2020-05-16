@@ -31,7 +31,6 @@ connection.autocommit = True
 cursor = connection.cursor()
 
 
-
 DEPART = 0
 COURSE_NUM = 1
 COURSE_NAME = 2
@@ -250,7 +249,12 @@ def timePrep(times):
 
         print("StartTime ", sTime, " EndTime ", eTime, "\n")
 
-        #sTime = str(i)
+        ################################################
+        #sh is the starting hour
+        #sm is the starting minute
+        #eh is the ending hour
+        #em is the ending minute
+        ################################################
         
         #deciding the times in 00:00 format
         if(len(sTime) == 1): #ex: 4 o clock
@@ -364,7 +368,7 @@ def selectFile(self,fileName):
     self.fileName = filedialog.askopenfilename()
 
 def addFile(self,fileName,fileType):
-    print("DEBUG: FILENAME: ", fileName)
+    print("DEBUG: FILENAME: ", fileName, fileType)
     f = open(fileName,'r')
     #f.read()
     fType = fileType    #0 for room list, 1 for event list,see examples provided for format
@@ -373,7 +377,7 @@ def addFile(self,fileName,fileType):
     times = []
     instructors = []
     
-    if fType == 0: #reading class list
+    if fType == 1: #reading class list
         print("CLASS LIST")
         buff = f.readlines()
         schedule = []
@@ -388,8 +392,8 @@ def addFile(self,fileName,fileType):
         print("TIMES\n\n", time)
 
         #code to add into database
-        cursor.execute(DBqueries.queryClearAll)
-        cursor.execute(DBqueries.queryLoadRooms)
+        # cursor.execute(DBqueries.queryClearAll)
+        # cursor.execute(DBqueries.queryLoadRooms)
         cursor.execute(DBqueries.queryLoadProf) 
         #Example:   
         #INSERT INTO events VALUES(1, 'Bio', '101', 10100, '10:00:00', '11:15:00', 'Generic Class', 1, 1) ON CONFLICT DO NOTHING;
@@ -419,15 +423,23 @@ def addFile(self,fileName,fileType):
                 cursor.execute(query1)
 
 
-    elif fType == 1: #reading room list
+    elif fType == 0: #reading room list
         print("Room lsit")
         buff = f.readlines()
         rm = []
         for line in buff:
             rm.append(roomRead(line, ','))
         rooms, capacitiesR = roomExtractor(rm)
-        
+        print("Testing Capacities", capacitiesR)
 
+        #code to add into database
+        cursor.execute(DBqueries.queryClearAll)
+
+        for i in range(len(rooms)):
+            #Example --- INSERT INTO rooms VALUES(1, 'ILSB', 118, 30, 'Classroom') ON CONFLICT DO NOTHING;
+            query1 = "INSERT INTO rooms VALUES(" + str(i)+", '"+ str(rooms[i]) +"', 1, " + capacitiesR[i]+", 'Classroom') ON CONFLICT DO NOTHING;"
+            cursor.execute(query1)
+            print("Adding: ", query1)
 
     else:
         print("Incorrect file format requested")

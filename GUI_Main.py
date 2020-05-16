@@ -11,6 +11,7 @@ from PIL import Image, ImageTk
 import fileOperations as fOp
 #import guiOperations as gOp
 import guiOpTest as gOp
+import manualAdd
 from Room import Room
 from Events import Events
 
@@ -149,12 +150,13 @@ class GUI_Main:
         # self.fb1Var = 0
         # self.fb2Var = 0
         self.fileName = " "
-        self.fileType = 0 #0 for room list, 1 for class list
+        self.fileType = IntVar()
+        self.fileType.set(0) #0 for room list, 1 for class list
         self.button_selectFile = Button(master,text="Select File",command=lambda: fOp.selectFile(self,self.fileName))
         self.label_fileType = Label(master,text="Select File Type:")
         self.rbutton_fileType1 = Radiobutton(master,text="Room List",variable=self.fileType, value = 0)
         self.rbutton_fileType2 = Radiobutton(master,text="Class List",variable=self.fileType, value = 1)
-        self.button_addFile = Button(master,text="Add Selected File",command=lambda:  fOp.addFile(self,self.fileName,self.fileType ) )
+        self.button_addFile = Button(master,text="Add Selected File",command=lambda:  fOp.addFile(self,self.fileName,self.fileType.get() ) )
         #fOp.addFile(self,self.fileName,self.fileType
         self.button_selectFile.grid(row=1)
         self.label_fileType.grid(row=2)
@@ -195,7 +197,7 @@ class GUI_Main:
         self.entry_addEvent_time = Entry(master)
         self.label_addEvent_capacity = Label(master,text="Capacity: ")
         self.entry_addEvent_capacity = Entry(master)
-        self.button_addEvent = Button(master,text="Add") #command to be added when file reading is complete
+        self.button_addEvent = Button(master,text="Add", command = lambda: [manualAdd.manualInputEvent(self.entry_addEvent_subject, self.entry_addEvent_courseNum, self.entry_addEvent_section), self.searchDB(self.entry_search_keyword,self.cb1Var,self.cb2Var,0,0)] ) #command to be added when file reading is complete
 
         self.label_addEvent_title.grid(row=0)
         self.label_addEvent_subject.grid(row=1,column=0)
