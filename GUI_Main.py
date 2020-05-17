@@ -179,7 +179,8 @@ class GUI_Main:
         self.entry_addRoom_number = Entry(master)
         self.label_addRoom_capacity = Label(master,text="Capacity: ")
         self.entry_addRoom_capacity = Entry(master)
-        self.button_addRoom = Button(master,text="Add") #command to be added when file reading is complete
+        #self.button_addRoom = Button(master,text="Add") #command to be added when file reading is complete
+        self.button_addRoom = Button(master,text="Add", command = lambda: [manualAdd.manualInputRoom(self.entry_addRoom_name, self.entry_addRoom_number, self.entry_addRoom_capacity), self.searchDB(self.entry_search_keyword,self.cb1Var,self.cb2Var,0,0)] ) #command to be added when file reading is complete
 
         self.label_addRoom_title.grid(row=1,columnspan=2)
         self.label_addRoom_name.grid(row=2,column=1)
@@ -204,7 +205,7 @@ class GUI_Main:
         self.entry_addEvent_time = Entry(master)
         self.label_addEvent_capacity = Label(master,text="Capacity: ")
         self.entry_addEvent_capacity = Entry(master)
-        self.button_addEvent = Button(master,text="Add", command = lambda: [manualAdd.manualInputEvent(self.entry_addEvent_subject, self.entry_addEvent_courseNum, self.entry_addEvent_section), self.searchDB(self.entry_search_keyword,self.cb1Var,self.cb2Var,0,0)] ) #command to be added when file reading is complete
+        self.button_addEvent = Button(master,text="Add", command = lambda: [manualAdd.manualInputEvent(self.entry_addEvent_subject, self.entry_addEvent_courseNum, self.entry_addEvent_time, self.entry_addEvent_section), self.searchDB(self.entry_search_keyword,self.cb1Var,self.cb2Var,0,0)] ) #command to be added when file reading is complete
 
         self.label_addEvent_title.grid(row=0)
         self.label_addEvent_subject.grid(row=1,column=0)
