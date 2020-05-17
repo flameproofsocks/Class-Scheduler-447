@@ -55,7 +55,7 @@ class GUI_Main:
         self.canvas_DataMaster = Canvas(master)
         self.canvas_DataMaster.pack(side="bottom",fill="both",expand=True)
 
-        self.canvas_rooms = Canvas(self.canvas_DataMaster,height=25)
+        self.canvas_rooms = Canvas(self.canvas_DataMaster,height=50)
         self.frame_rooms = Frame(self.canvas_rooms)
 
         self.canvas_times = Canvas(self.canvas_DataMaster,width = 55)
@@ -99,17 +99,18 @@ class GUI_Main:
         w = len(roomList * 111)
         self.canvas_rooms.configure(width = w)
         self.canvas_classes.configure(width = w)
-        self.font_DisplayItems = Font(family = "Arial",size = 15)
+        self.font_HeaderItems = Font(family = "Arial",size = 15)
+        self.font_DetailItems = Font(family="Verdana",size = 10)
 
-        self.gridWidth = 10
-        self.gridHeight = 1
+        self.gridWidth = 15
+        self.gridHeight = 2
         
         i = 1
         flag = 0
         timeDisplay = 8.0 #start at 8 AM
         for item in roomList:
             print("item %d",i)
-            self.label_room = Label(self.frame_rooms,text = item.getRoomName(), font = self.font_DisplayItems,width = self.gridWidth,height = self.gridHeight,bd = 2,relief= "groove")
+            self.label_room = Label(self.frame_rooms,text = item.getRoomName(), font = self.font_HeaderItems,width = self.gridWidth,height = self.gridHeight,bd = 2,relief= "groove")
             self.label_room.grid(row=0 ,column = i, sticky = W)
             i = i + 1
             #time slots on left side
@@ -119,8 +120,8 @@ class GUI_Main:
                         timeDisplay = timeDisplay + 12
                     timeDisplayString = str(format(timeDisplay,".2f"))
                     timeDisplayString = timeDisplayString.replace(".",":")
-                    self.label_time = Label(self.frame_times, text = timeDisplayString, font = self.font_DisplayItems,height = self.gridHeight)
-                    self.label_time.grid(row = x + 1,column = 0, sticky = W)
+                    self.label_time = Label(self.frame_times, text = timeDisplayString, font = self.font_HeaderItems,height = self.gridHeight*2,bd = 2,relief= "groove")
+                    self.label_time.grid(row = x + 1,column = 0, sticky = "EW")
                     timeDisplay = (timeDisplay + .3)
                     if(round(timeDisplay) > timeDisplay):
                         timeDisplay = round(timeDisplay)
@@ -129,9 +130,15 @@ class GUI_Main:
             #events in each room per time slot
             for time in range(len(item.timeSlots)):
                 self.placeholderEvent = item.getEvent(time)
-                self.button_event = Button(self.frame_classes, text = self.placeholderEvent.getSubject()+" "+self.placeholderEvent.getCourseNum() , font = self.font_DisplayItems,width = self.gridWidth,height = self.gridHeight)
-                self.button_event.configure(command = lambda: self.buildEventInfoFrame(self.frame_EventInfo, self.placeholderEvent))
-                self.button_event.grid(row = time + 1, column = i, sticky = W)
+                self.text_header_label_event = self.placeholderEvent.getSubject()+" "+self.placeholderEvent.getCourseNum()+"-"+self.placeholderEvent.getSection()
+                self.text_details_label_event = " "
+                if(self.placeholderEvent.getSubject()!=" "):
+                    self.text_details_label_event = "Instructor: "+self.placeholderEvent.getInstructor()+"\nCapacity: "+str(self.placeholderEvent.getCapacity())
+                    self.label_eventDetail = Label
+                self.label_eventTitle = Label(self.frame_classes, text = self.text_header_label_event , font = self.font_HeaderItems,width = self.gridWidth,height = self.gridHeight,bd = 2,relief= "groove",pady=3)
+                self.label_eventDetail = Label(self.frame_classes, text = self.text_details_label_event, font=self.font_DetailItems,width= self.gridWidth,height = self.gridHeight,bd = 2,relief= "groove",pady=3)
+                self.label_eventTitle.grid(row = (time*2) + 1, column = i, sticky = W)
+                self.label_eventDetail.grid(row=(time*2)+2,column=i,sticky="EW")
 
     def function1(self,event):
         self.canvas_classes.configure(scrollregion=self.canvas_classes.bbox("all"))
