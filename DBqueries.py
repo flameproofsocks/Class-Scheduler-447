@@ -1,3 +1,10 @@
+###
+# Created on Apr 8,2020
+#
+# @author: Brady Ronayne
+# Sample and useful queries (postgreSQL)
+###
+
 findIndexRooms = """
 select MAX(roomID) from rooms;
 """

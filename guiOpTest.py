@@ -1,3 +1,10 @@
+###
+# Created on Apr 6,2020
+#
+# @author: Brady Ronayne
+# Searches the database
+###
+
 from Room import Room
 from Events import Events
 
@@ -25,7 +32,7 @@ def searchDB(self, keywords,searchRooms,searchEvents):
     #search events for keywords is searchEvents = 1
     #place correct itmes in roomList
     roomList = []
-    print ("DEBUG: ", searchEvents.get())
+    #print ("DEBUG: ", searchEvents.get())
 
     #TESTING
     idList = []

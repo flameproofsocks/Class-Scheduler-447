@@ -1,6 +1,5 @@
 ###
 # Created on Apr 6,2020
-# Updated April 22 2020
 #
 # @author: Brady Ronayne
 # SHould take from online database
@@ -17,6 +16,7 @@ import psycopg2
 import psycopg2.extensions
 import os
 
+#A sample conenction to local server
 # connection = psycopg2.connect(user = "postgres",
 #                                   password = "password",
 #                                   host = "localhost",
@@ -28,7 +28,6 @@ connection = psycopg2.connect(user = "postgres",
                                   host = "database447.cst3jimtz2ge.us-east-2.rds.amazonaws.com",
                                   port = "5432",
                                   database = "ClassScheduler")
-
                                   
 #setup database
 connection.autocommit = True
@@ -40,10 +39,10 @@ record = cursor.fetchone()
 print("You are connected to - ", record,"\n")
 
 ###reload sample events
-cursor.execute(DBqueries.queryClearAll)
-cursor.execute(DBqueries.queryLoadRooms)
-cursor.execute("INSERT INTO prof VALUES(1, 'John', 'Smith', 'Chalk Allergy', 'www.website.com', 'A generic teacher, hates chalk, talks loudly, students still fall asleep' ) ON CONFLICT DO NOTHING;")
-cursor.execute(DBqueries.queryLoadEvents)
+# cursor.execute(DBqueries.queryClearAll)
+# cursor.execute(DBqueries.queryLoadRooms)
+# cursor.execute("INSERT INTO prof VALUES(1, 'John', 'Smith', 'Chalk Allergy', 'www.website.com', 'A generic teacher, hates chalk, talks loudly, students still fall asleep' ) ON CONFLICT DO NOTHING;")
+# cursor.execute(DBqueries.queryLoadEvents)
 
 query1 = "select roomid, building, roomnum, capacity from rooms"
 cursor.execute(query1)
@@ -84,7 +83,7 @@ for i in range(len(roomList)):
         except:
             lastName = "Unknown"
         timeSlot = (int(str(startTime)[:2]) - 8)*2 // 1 + (int(str(startTime)[3:5]) // 29 )
-        print("Time: ", startTime, "timeSlot", timeSlot, "--", (int(str(startTime)[3:5]) // 29 ), )
+        #print("Time: ", startTime, "timeSlot", timeSlot, "--", (int(str(startTime)[3:5]) // 29 ), )
         roomList[i].addEvent(timeSlot,Events(eventName, courseNum," ","1", str(lastName),"TTH" + str(timeSlot) ,50))
         j += 1 #index for adding events
     

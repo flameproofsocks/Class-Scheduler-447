@@ -380,19 +380,15 @@ def addFile(self,fileName,fileType):
     instructors = []
     
     if fType == 1: #reading class list
-        print("CLASS LIST")
         buff = f.readlines()
         schedule = []
         for line in buff:
-            print("i")
             schedule.append(scheduleRead(line, ','))
-        print("The schedule: ", schedule)
         departments, course_nums, course_names, sec_names, sections, instructors, times, capacitiesS = scheduleExtractor(schedule)
         lnames, fnames = nameFinder(instructors)
 
         #setup times
         days, time = timePrep(times)
-        print("TIMES\n\n", time)
 
         #code to add into database
         # cursor.execute(DBqueries.queryClearAll)
@@ -411,7 +407,6 @@ def addFile(self,fileName,fileType):
             try:
                 roomIndex = cursor.fetchone()[0]
             except:
-                print("No rooms?")  
                 j = 0
                 if days[i] == "10101":
                     while j < (len(EXTRA_TIMES_MWF) - 1):
@@ -423,10 +418,8 @@ def addFile(self,fileName,fileType):
                         try:
                             roomIndex = cursor.fetchone()[0]
                         except:
-                            print("Second check failed")
                             j = j - 8
                         if roomIndex != None:
-                            print("MWF room: ", j)
                             time[i][0] = EXTRA_TIMES_MWF[j-10]
                             time[i][1] = EXTRA_TIMES_MWF[j-9]
                             j = 99
@@ -440,17 +433,14 @@ def addFile(self,fileName,fileType):
                         try:
                             roomIndex = cursor.fetchone()[0]
                         except:
-                            print("Second check failed")
                             j = j - 8
                         if roomIndex != None:
-                            print("Room found: ", j)
                             time[i][0] = EXTRA_TIMES[j-10]
                             time[i][1] = EXTRA_TIMES[j-9]
                             j = 99
 
             #Find the professor
             profIndex = DBqueries.findProfessor(lnames[i], fnames[i])
-            print("Returned profI: ", profIndex)
 
             #Insert the Event
             query1 = ("INSERT INTO events VALUES("+ str(i) + " , '"+ str(course_names[i]) + "', '" + str(course_nums[i]) +"', " + str(days[i])+", "
@@ -466,7 +456,6 @@ def addFile(self,fileName,fileType):
 
 
     elif fType == 0: #reading room list
-        print("Room lsit")
         buff = f.readlines()
         rm = []
         for line in buff:
@@ -481,7 +470,7 @@ def addFile(self,fileName,fileType):
             #Example --- INSERT INTO rooms VALUES(1, 'ILSB', 118, 30, 'Classroom') ON CONFLICT DO NOTHING;
             query1 = "INSERT INTO rooms VALUES(" + str(i)+", '"+ str(rooms[i]) +"', 1, " + capacitiesR[i]+", 'Classroom') ON CONFLICT DO NOTHING;"
             cursor.execute(query1)
-            print("Adding: ", query1)
+            #print("Adding: ", query1)
 
     else:
         print("Incorrect file format requested")
