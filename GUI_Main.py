@@ -96,7 +96,9 @@ class GUI_Main:
         sTime = 0 + startTime #starts at 0, max eTime
         eTime = 28 - endTime  #starts at max of roomList timeslots, should be 28, min sTime
         #NO ERROR CHECKING, please do error checing before calling buildItems
-        w = len(roomList * 111)
+        w = len(roomList * 170)
+        if w > 1190: #adding a max w for large sets
+            w = 1190
         self.canvas_rooms.configure(width = w)
         self.canvas_classes.configure(width = w)
         self.font_HeaderItems = Font(family = "Arial",size = 15)
@@ -130,7 +132,7 @@ class GUI_Main:
             #events in each room per time slot
             for time in range(len(item.timeSlots)):
                 self.placeholderEvent = item.getEvent(time)
-                self.text_header_label_event = self.placeholderEvent.getSubject()+" "+self.placeholderEvent.getCourseNum()+"-"+self.placeholderEvent.getSection()
+                self.text_header_label_event = self.placeholderEvent.getSubject()[:10]+" "+self.placeholderEvent.getCourseNum()+"-"+self.placeholderEvent.getSection()
                 self.text_details_label_event = " "
                 if(self.placeholderEvent.getSubject()!=" "):
                     self.text_details_label_event = "Instructor: "+self.placeholderEvent.getInstructor()+"\nCapacity: "+str(self.placeholderEvent.getCapacity())

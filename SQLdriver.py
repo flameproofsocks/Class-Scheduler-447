@@ -39,7 +39,7 @@ cursor.execute("SELECT version();")
 record = cursor.fetchone()
 print("You are connected to - ", record,"\n")
 
-###reload events
+###reload sample events
 cursor.execute(DBqueries.queryClearAll)
 cursor.execute(DBqueries.queryLoadRooms)
 cursor.execute("INSERT INTO prof VALUES(1, 'John', 'Smith', 'Chalk Allergy', 'www.website.com', 'A generic teacher, hates chalk, talks loudly, students still fall asleep' ) ON CONFLICT DO NOTHING;")
