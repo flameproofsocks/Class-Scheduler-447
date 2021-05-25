@@ -1,5 +1,5 @@
 # Author:
-# Ahmed
+# Ahmed, Brady
 
 from tkinter import filedialog
 import DBqueries
